@@ -2,6 +2,8 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json, urllib.request, urllib.error, os
 
 PORT = int(os.environ.get('PORT', 8765))
+OMIE_KEY = os.environ.get('OMIE_KEY', '')
+OMIE_SECRET = os.environ.get('OMIE_SECRET', '')
 
 ALLOWED_EMAILS = [
     "mauro@ondigital.seg.br",
@@ -15,15 +17,12 @@ GOOGLE_CLIENT_ID = "359112436189-bempnilpn1vfj3p6qhobjjhcnhdjfjt4.apps.googleuse
 def verify_google_token(token):
     try:
         url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
-        req = urllib.request.Request(url)
-        with urllib.request.urlopen(req, timeout=10) as r:
+        with urllib.request.urlopen(url, timeout=10) as r:
             data = json.loads(r.read())
         if data.get("aud") != GOOGLE_CLIENT_ID:
             return None
         email = data.get("email", "")
-        if email in ALLOWED_EMAILS:
-            return email
-        return None
+        return email if email in ALLOWED_EMAILS else None
     except:
         return None
 
@@ -36,64 +35,65 @@ class OmieProxy(BaseHTTPRequestHandler):
     def do_POST(self):
         length = int(self.headers.get('Content-Length', 0))
         body = self.rfile.read(length)
+        path = self.path.strip('/')
 
         # Auth verification endpoint
-        if self.path.strip('/') == 'auth/verify':
+        if path == 'auth/verify':
             try:
                 data = json.loads(body)
-                token = data.get('token', '')
-                email = verify_google_token(token)
-                self.send_response(200)
-                self._cors()
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                if email:
-                    self.wfile.write(json.dumps({'ok': True, 'email': email}).encode())
-                else:
-                    self.wfile.write(json.dumps({'ok': False, 'error': 'Acesso não autorizado'}).encode())
+                email = verify_google_token(data.get('token', ''))
+                self._respond(200, {'ok': bool(email), 'email': email or '', 'error': '' if email else 'Acesso não autorizado'})
             except Exception as e:
+                self._respond(200, {'ok': False, 'error': str(e)})
+            return
+
+        # Omie data endpoint — uses credentials from environment
+        if path == 'omie/data':
+            auth_header = self.headers.get('X-Auth-Token', '')
+            if not verify_google_token(auth_header):
+                self._respond(401, {'error': 'Não autorizado'})
+                return
+            try:
+                data = json.loads(body)
+                endpoint = data.get('endpoint', '')
+                call = data.get('call', '')
+                param = data.get('param', {})
+                payload = {
+                    'call': call,
+                    'app_key': OMIE_KEY,
+                    'app_secret': OMIE_SECRET,
+                    'param': [param]
+                }
+                url = f'https://app.omie.com.br/api/v1/{endpoint}/'
+                req = urllib.request.Request(url,
+                    data=json.dumps(payload).encode(),
+                    headers={'Content-Type': 'application/json'},
+                    method='POST')
+                with urllib.request.urlopen(req, timeout=15) as r:
+                    result = r.read()
                 self.send_response(200)
                 self._cors()
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({'ok': False, 'error': str(e)}).encode())
+                self.wfile.write(result)
+            except urllib.error.HTTPError as e:
+                self.send_response(e.code)
+                self._cors()
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(e.read())
+            except Exception as e:
+                self._respond(500, {'erro': str(e)})
             return
 
-        # Verify auth token for all Omie API calls
-        auth_header = self.headers.get('X-Auth-Token', '')
-        if not auth_header or not verify_google_token(auth_header):
-            self.send_response(401)
-            self._cors()
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': 'Não autorizado'}).encode())
-            return
+        self._respond(404, {'error': 'Not found'})
 
-        # Proxy to Omie
-        path = self.path.lstrip('/')
-        url = f'https://app.omie.com.br/api/v1/{path}/'
-        try:
-            req = urllib.request.Request(url, data=body,
-                headers={'Content-Type': 'application/json'}, method='POST')
-            with urllib.request.urlopen(req, timeout=15) as r:
-                data = r.read()
-            self.send_response(200)
-            self._cors()
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(data)
-        except urllib.error.HTTPError as e:
-            self.send_response(e.code)
-            self._cors()
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(e.read())
-        except Exception as e:
-            self.send_response(500)
-            self._cors()
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({'erro': str(e)}).encode())
+    def _respond(self, code, data):
+        self.send_response(code)
+        self._cors()
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode())
 
     def _cors(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -104,4 +104,5 @@ class OmieProxy(BaseHTTPRequestHandler):
         print(f"[Omie] {self.address_string()} -> {args[0]}")
 
 print(f"Servidor rodando na porta {PORT}")
+print(f"OMIE_KEY configurada: {'sim' if OMIE_KEY else 'NAO'}")
 HTTPServer(('', PORT), OmieProxy).serve_forever()
