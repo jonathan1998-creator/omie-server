@@ -1,185 +1,199 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Financeiro — ON Digital</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-    :root {
-        --primary: #2d1b69;
-        --secondary: #e2533a;
-        --bg: #f8f9fa;
-        --card-bg: #ffffff;
-        --text: #1a1a1a;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--bg); color:var(--text); padding:2rem}
-    
-    /* Layout */
-    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:12px; background: #fff; padding: 1rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
-    .logo-text{font-size:20px;font-weight:700;color:var(--primary)}
-    
-    /* Botão e Config */
-    .btn-config { padding: 10px 20px; background: var(--bg); border: 1px solid #ddd; border-radius: 8px; cursor: pointer; font-weight: 500; transition: 0.3s;}
-    .btn-config:hover { background: #eee; }
-    .config-panel { display: none; background: #fff; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #ddd; animation: slideIn 0.3s ease; }
-    .config-panel.open { display: block; }
-    @keyframes slideIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
-    
-    .input-group { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-    .input-omie { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; min-width: 200px;}
-    .btn-connect { padding: 10px 25px; background: var(--primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;}
-    
-    /* Métricas */
-    .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-bottom:2rem}
-    .metric{background:var(--card-bg);border-radius:12px;padding:1.5rem;box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #eee; transition: transform 0.2s;}
-    .metric:hover { transform: translateY(-5px); }
-    .metric-label{font-size:14px;color:#666;margin-bottom:8px; font-weight: 500;}
-    .metric-value{font-size:28px;font-weight:700; color: var(--primary);}
-    .val-negative { color: var(--secondary) !important; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BI Financeiro | ON Digital</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2d1b69;
+            --secondary: #e2533a;
+            --success: #0a5e38;
+            --warning: #e9a23b;
+            --danger: #c0392b;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1a0f3c;
+            --text-sub: #666;
+        }
 
-    /* Gráficos e Cards */
-    .grid-main { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
-    @media (max-width: 900px) { .grid-main { grid-template-columns: 1fr; } }
-    .card{background:var(--card-bg);border-radius:12px;padding:1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #eee;}
-    .card-title{font-size:16px;font-weight:700;margin-bottom:1.5rem; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 10px;}
-    
-    /* Tabela */
-    .table-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    th{text-align:left;padding:12px;color:#888;border-bottom: 2px solid #eee; font-weight: 600;}
-    td{padding:12px;border-bottom:1px solid #f5f5f5}
-    .pill{padding:4px 12px; border-radius:20px; font-size:12px; font-weight: 600; text-transform: uppercase;}
-    .pill-ok{background:#d1e7dd;color:#0a5e38}
-    .pill-warn{background:#fff3cd;color:#856404}
-</style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text-main); padding: 20px; }
+
+        /* Header */
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 30px; background: #fff; padding: 15px 25px; 
+            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .logo-area h1 { font-size: 22px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .logo-area p { font-size: 12px; color: var(--text-sub); }
+
+        /* Config Menu */
+        .config-trigger { 
+            background: var(--bg); border: 1px solid #ddd; padding: 10px; 
+            border-radius: 10px; cursor: pointer; transition: 0.3s;
+        }
+        .config-trigger:hover { background: #e0e0e0; }
+        
+        .config-overlay {
+            display: none; position: fixed; top: 85px; right: 20px; 
+            background: #fff; padding: 20px; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 1000; width: 300px;
+            border: 1px solid #eee;
+        }
+        .config-overlay.active { display: block; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .input-field { width: 100%; padding: 10px; margin: 8px 0 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; }
+        .btn-update { 
+            width: 100%; padding: 12px; background: var(--primary); color: #fff; 
+            border: none; border-radius: 8px; cursor: pointer; font-weight: 600;
+        }
+
+        /* Metrics */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .metric-card { 
+            background: #fff; padding: 25px; border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); position: relative; overflow: hidden;
+            border-bottom: 4px solid #ddd;
+        }
+        .metric-card.receber { border-color: var(--primary); }
+        .metric-card.pagar { border-color: var(--secondary); }
+        .metric-card.saldo { border-color: var(--success); }
+        
+        .metric-card label { font-size: 13px; color: var(--text-sub); font-weight: 500; text-transform: uppercase; }
+        .metric-card .value { font-size: 28px; font-weight: 800; margin: 10px 0; display: block; }
+        .metric-card i { position: absolute; right: 20px; top: 25px; font-size: 24px; opacity: 0.1; }
+
+        /* Charts */
+        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
+        @media (max-width: 1000px) { .charts-container { grid-template-columns: 1fr; } }
+        
+        .card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+        /* Table */
+        .table-area { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 15px 10px; color: var(--text-sub); font-size: 12px; border-bottom: 2px solid #f0f0f0; }
+        td { padding: 15px 10px; border-bottom: 1px solid #f8f8f8; font-size: 14px; }
+        
+        .pill { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .pill-receber { background: #e8eaf6; color: var(--primary); }
+        .pill-pagar { background: #fff0ee; color: var(--secondary); }
+        .pill-status { background: #f0f0f0; color: #666; }
+        .status-atrasado { background: #fff0f0; color: var(--danger); }
+        .status-ok { background: #e6f4ea; color: var(--success); }
+
+        #loading-bar { 
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--secondary); 
+            width: 0%; transition: 0.3s; z-index: 2000;
+        }
+    </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div>
-    <div class="logo-text">ON Digital</div>
-    <div style="font-size:12px;color:#666">Gestão Financeira Profissional</div>
-  </div>
-  <button class="btn-config" onclick="toggleConfig()">⚙️ Configurar Conexão</button>
-</div>
+    <div id="loading-bar"></div>
 
-<div id="config-panel" class="config-panel">
-    <div style="font-weight: 600; margin-bottom: 10px;">Credenciais Omie (Acesso Temporário)</div>
-    <div class="input-group">
-        <input type="text" id="app-key" class="input-omie" placeholder="Insira sua App Key">
-        <input type="password" id="app-secret" class="input-omie" placeholder="Insira seu App Secret">
-        <button class="btn-connect" id="btn-main" onclick="carregarDashboard()">Atualizar Dados</button>
+    <header>
+        <div class="logo-area">
+            <h1><i class="fas fa-chart-line"></i> ON Digital</h1>
+            <p>Gestão Financeira Estratégica</p>
+        </div>
+        <button class="config-trigger" onclick="toggleConfig()">
+            <i class="fas fa-cog"></i> Configurações
+        </button>
+    </header>
+
+    <div class="config-overlay" id="config-menu">
+        <label style="font-size: 12px; font-weight: bold;">Credenciais Omie</label>
+        <input type="text" id="app-key" class="input-field" placeholder="App Key">
+        <input type="password" id="app-secret" class="input-field" placeholder="App Secret">
+        <button class="btn-update" onclick="carregarDados()">
+            <i class="fas fa-sync"></i> Sincronizar Agora
+        </button>
+        <p style="font-size: 10px; color: #999; margin-top: 10px; text-align: center;">
+            As chaves não são salvas no servidor.
+        </p>
     </div>
-    <div style="font-size: 11px; color: #999; margin-top: 10px;">As chaves não são armazenadas no servidor. Elas expiram ao fechar o navegador.</div>
-</div>
 
-<div class="metrics">
-  <div class="metric"><div class="metric-label">Total a Receber</div><div class="metric-value" id="m1">R$ 0</div></div>
-  <div class="metric"><div class="metric-label">Total a Pagar</div><div class="metric-value val-negative" id="m2">R$ 0</div></div>
-  <div class="metric"><div class="metric-label">Saldo em Aberto</div><div class="metric-value" id="m4">R$ 0</div></div>
-</div>
-
-<div class="grid-main">
-    <div class="card">
-        <div class="card-title">Fluxo de Caixa Operacional</div>
-        <div style="height: 300px;"><canvas id="chart-fluxo"></canvas></div>
+    <div class="metrics-grid">
+        <div class="metric-card receber">
+            <i class="fas fa-arrow-down"></i>
+            <label>Contas a Receber</label>
+            <span class="value" id="m-receber">R$ 0,00</span>
+        </div>
+        <div class="metric-card pagar">
+            <i class="fas fa-arrow-up"></i>
+            <label>Contas a Pagar</label>
+            <span class="value" id="m-pagar" style="color: var(--secondary)">R$ 0,00</span>
+        </div>
+        <div class="metric-card saldo">
+            <i class="fas fa-wallet"></i>
+            <label>Saldo Líquido</label>
+            <span class="value" id="m-saldo">R$ 0,00</span>
+        </div>
     </div>
+
+    <div class="charts-container">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-columns"></i> Comparativo de Fluxo</div>
+            <div style="height: 300px;"><canvas id="chart-barras"></canvas></div>
+        </div>
+        <div class="card">
+            <div class="card-title"><i class="fas fa-chart-pie"></i> Composição</div>
+            <div style="height: 300px;"><canvas id="chart-pizza"></canvas></div>
+        </div>
+    </div>
+
     <div class="card">
-        <div class="card-title">Lançamentos Recentes</div>
-        <div class="table-wrap">
+        <div class="card-title"><i class="fas fa-list"></i> Movimentações Recentes</div>
+        <div class="table-area">
             <table>
-                <thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>VENCIMENTO</th>
+                        <th>DESCRIÇÃO / PARCEIRO</th>
+                        <th>CATEGORIA</th>
+                        <th>VALOR</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
                 <tbody id="table-body">
-                    <tr><td colspan="3" style="text-align:center; color:#999; padding:40px;">Aguardando conexão...</td></tr>
+                    <tr><td colspan="5" style="text-align:center; padding:50px; color:#999;">Abra as configurações para carregar os dados reais.</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
-</div>
 
-<script>
-const RAILWAY_URL = 'https://web-production-62be6.up.railway.app';
-const fmt = v => 'R$ ' + Math.abs(Math.round(v)).toLocaleString('pt-BR');
-let chartFluxo = null;
+    <script>
+        const RAILWAY_URL = 'https://web-production-62be6.up.railway.app';
+        let charts = {};
 
-function toggleConfig() {
-    document.getElementById('config-panel').classList.toggle('open');
-}
+        function toggleConfig() { document.getElementById('config-menu').classList.toggle('active'); }
 
-async function omieCall(endpoint, call, param) {
-  const key = document.getElementById('app-key').value;
-  const secret = document.getElementById('app-secret').value;
-  const res = await fetch(`${RAILWAY_URL}/omie/data`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ endpoint, call, param, app_key: key, app_secret: secret })
-  });
-  return await res.json();
-}
+        const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
-function updateChart(entradas, saidas) {
-    if(chartFluxo) chartFluxo.destroy();
-    const ctx = document.getElementById('chart-fluxo').getContext('2d');
-    chartFluxo = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Total'],
-            datasets: [
-                { label: 'A Receber', data: [entradas], backgroundColor: '#2d1b69', borderRadius: 8 },
-                { label: 'A Pagar', data: [saidas], backgroundColor: '#e2533a', borderRadius: 8 }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-    });
-}
+        async function api(endpoint, call, param) {
+            const key = document.getElementById('app-key').value;
+            const secret = document.getElementById('app-secret').value;
+            
+            const res = await fetch(`${RAILWAY_URL}/omie/data`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ endpoint, call, param, app_key: key, app_secret: secret })
+            });
+            return await res.json();
+        }
 
-async function carregarDashboard() {
-  const btn = document.getElementById('btn-main');
-  btn.textContent = 'Buscando...';
-  btn.disabled = true;
-
-  try {
-    const [recData, pagData] = await Promise.all([
-      omieCall('financas/contareceber', 'ListarContasReceber', { pagina: 1, registros_por_pagina: 20, apenas_importado_api: 'N' }),
-      omieCall('financas/contapagar', 'ListarContasPagar', { pagina: 1, registros_por_pagina: 20, apenas_importado_api: 'N' })
-    ]);
-
-    let tRec = 0, tPag = 0;
-    const lista = [];
-
-    (recData.conta_receber_cadastro || []).forEach(r => {
-      const v = parseFloat(r.valor_documento || 0); tRec += v;
-      lista.push({ data: r.data_vencimento, valor: v, status: r.status_titulo });
-    });
-
-    (pagData.conta_pagar_cadastro || []).forEach(p => {
-      const v = parseFloat(p.valor_documento || 0); tPag += v;
-      lista.push({ data: p.data_vencimento, valor: -v, status: p.status_titulo });
-    });
-
-    document.getElementById('m1').textContent = fmt(tRec);
-    document.getElementById('m2').textContent = fmt(tPag);
-    document.getElementById('m4').textContent = fmt(tRec - tPag);
-
-    document.getElementById('table-body').innerHTML = lista.slice(0,10).map(item => `
-      <tr>
-        <td>${item.data || '---'}</td>
-        <td style="color:${item.valor < 0 ? '#e2533a' : '#1a1a1a'}; font-weight:600">${fmt(item.valor)}</td>
-        <td><span class="pill ${item.status === 'RECEBIDO' || item.status === 'PAGO' ? 'pill-ok' : 'pill-warn'}">${item.status || 'PENDENTE'}</span></td>
-      </tr>
-    `).join('');
-
-    updateChart(tRec, tPag);
-    btn.textContent = 'Atualizar';
-    toggleConfig(); // Fecha o painel após sucesso
-  } catch (e) {
-    alert('Erro ao carregar dados. Verifique as chaves.');
-    btn.textContent = 'Tentar Novamente';
-  }
-  btn.disabled = false;
-}
-</script>
-</body>
-</html>
+        async function carregarDados() {
+            const loading = document.getElementById('loading-bar');
+            loading.style.width = '30%';
+            
+            try {
+                const [rec, pag] = await Promise.all([
+                    api('financas/contareceber', 'ListarContasReceber', { pagina: 1, registros_por_pagina: 50, apenas_importado_api: 'N' }),
+                    api
