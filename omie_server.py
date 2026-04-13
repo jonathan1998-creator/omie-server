@@ -1,5 +1,5 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
-import json, urllib.request, urllib.error, os, base64
+import json, urllib.request, urllib.error, os, base64, secrets, time
 
 PORT = int(os.environ.get('PORT', 8765))
 OMIE_KEY = os.environ.get('OMIE_KEY', '')
@@ -14,21 +14,13 @@ ALLOWED_EMAILS = [
 
 GOOGLE_CLIENT_ID = "359112436189-bempnilpn1vfj3p6qhobjjhcnhdjfjt4.apps.googleusercontent.com"
 
-def decode_jwt_payload(token):
-    try:
-        parts = token.split('.')
-        if len(parts) != 3:
-            return None
-        payload = parts[1]
-        payload += '=' * (4 - len(payload) % 4)
-        return json.loads(base64.urlsafe_b64decode(payload))
-    except:
-        return None
+# Session store: {session_token: {email, expires_at}}
+sessions = {}
+SESSION_DURATION = 60 * 60 * 12  # 12 horas
 
 def verify_google_token(token):
     if not token:
         return None
-    # First try tokeninfo endpoint
     try:
         url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
         with urllib.request.urlopen(url, timeout=10) as r:
@@ -38,19 +30,33 @@ def verify_google_token(token):
         email = data.get("email", "")
         return email if email in ALLOWED_EMAILS else None
     except:
-        pass
-    # Fallback: decode JWT and check email (less secure but handles edge cases)
-    try:
-        payload = decode_jwt_payload(token)
-        if not payload:
-            return None
-        email = payload.get("email", "")
-        aud = payload.get("aud", "")
-        if aud == GOOGLE_CLIENT_ID and email in ALLOWED_EMAILS:
-            return email
+        # Fallback: decode JWT payload
+        try:
+            parts = token.split('.')
+            payload = parts[1] + '=' * (4 - len(parts[1]) % 4)
+            data = json.loads(base64.urlsafe_b64decode(payload))
+            email = data.get("email", "")
+            if data.get("aud") == GOOGLE_CLIENT_ID and email in ALLOWED_EMAILS:
+                return email
+        except:
+            pass
         return None
-    except:
+
+def create_session(email):
+    token = secrets.token_hex(32)
+    sessions[token] = {'email': email, 'expires_at': time.time() + SESSION_DURATION}
+    return token
+
+def verify_session(token):
+    if not token or token not in sessions:
         return None
+    session = sessions[token]
+    if time.time() > session['expires_at']:
+        del sessions[token]
+        return None
+    # Renew session on each use
+    session['expires_at'] = time.time() + SESSION_DURATION
+    return session['email']
 
 class OmieProxy(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -63,20 +69,26 @@ class OmieProxy(BaseHTTPRequestHandler):
         body = self.rfile.read(length)
         path = self.path.strip('/')
 
+        # Login: verify Google token and return session token
         if path == 'auth/verify':
             try:
                 data = json.loads(body)
                 email = verify_google_token(data.get('token', ''))
-                self._respond(200, {'ok': bool(email), 'email': email or ''})
+                if email:
+                    session_token = create_session(email)
+                    self._respond(200, {'ok': True, 'email': email, 'session': session_token})
+                else:
+                    self._respond(200, {'ok': False, 'error': 'E-mail não autorizado'})
             except Exception as e:
                 self._respond(200, {'ok': False, 'error': str(e)})
             return
 
+        # Omie data: verify session token
         if path == 'omie/data':
             auth = self.headers.get('X-Auth-Token', '')
-            email = verify_google_token(auth)
+            email = verify_session(auth)
             if not email:
-                self._respond(200, {'error': 'unauthorized', 'faultstring': 'Sessão expirada. Faça login novamente.'})
+                self._respond(200, {'faultstring': 'Sessão expirada. Faça login novamente.'})
                 return
             try:
                 data = json.loads(body)
