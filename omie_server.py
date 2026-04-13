@@ -5,33 +5,31 @@ import urllib.request
 import json
 
 app = Flask(__name__)
-# O CORS abaixo libera a comunicação com o seu site no Netlify automaticamente
 CORS(app) 
 
 PORT = int(os.environ.get('PORT', 8080))
-OMIE_KEY = os.environ.get('OMIE_KEY', '')
-OMIE_SECRET = os.environ.get('OMIE_SECRET', '')
 
 @app.route('/omie/data', methods=['POST'])
 def omie_proxy():
-    # Recebe o pedido do Frontend
+    # Recebe tudo do frontend (incluindo as chaves que você digitou)
     data = request.json
     endpoint = data.get('endpoint')
     call = data.get('call')
     param = data.get('param', {})
+    app_key = data.get('app_key')
+    app_secret = data.get('app_secret')
 
-    # Monta o pacote de dados para enviar ao Omie (usando as chaves do Railway)
+    # Monta a requisição com as chaves recebidas na hora
     payload = {
         "call": call,
-        "app_key": OMIE_KEY,
-        "app_secret": OMIE_SECRET,
+        "app_key": app_key,
+        "app_secret": app_secret,
         "param": [param]
     }
     
     url = f"https://app.omie.com.br/api/v1/{endpoint}/"
     
     try:
-        # Faz a requisição oficial para o Omie
         req = urllib.request.Request(
             url, 
             data=json.dumps(payload).encode('utf-8'),
