@@ -15,66 +15,61 @@
             --warning: #f59e0b;
             --bg: #f3f4f6;
             --sidebar: #1e1b4b;
-            --white: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar Navigation */
+        /* Sidebar */
         .sidebar { width: 260px; background: var(--sidebar); color: #fff; display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
         .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding-left: 10px; }
         .logo-img { height: 35px; width: auto; }
         
         .nav-item { 
             padding: 14px 18px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; 
-            gap: 12px; font-size: 14px; font-weight: 500; margin-bottom: 8px; transition: 0.2s; color: #a5b4fc;
+            gap: 12px; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #a5b4fc; transition: 0.2s;
         }
         .nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
         .nav-item.active { background: var(--primary); color: #fff; }
 
-        /* Content Area */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; }
+        /* Main Area */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         header { 
             background: #fff; padding: 16px 40px; display: flex; justify-content: space-between; 
-            align-items: center; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 10;
+            align-items: center; border-bottom: 1px solid #e5e7eb; sticky: top; z-index: 100;
         }
         .view-section { display: none; padding: 30px 40px; }
-        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
 
-        /* KPI Cards */
+        /* KPIs */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #f3f4f6; }
-        .kpi-card label { font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; }
+        .kpi-card { background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .kpi-card label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; }
         .kpi-card .val { font-size: 24px; font-weight: 800; margin-top: 8px; display: block; color: var(--sidebar); }
-        .blur-target.blur-val { filter: blur(8px); pointer-events: none; }
+        .blur-val { filter: blur(8px); }
 
-        /* Tables & Charts */
-        .card { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 16px; font-weight: 700; color: var(--sidebar); }
+        /* Cards & Tables */
+        .card { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .card-title { font-size: 16px; font-weight: 700; color: var(--sidebar); margin-bottom: 20px; }
         
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { text-align: left; padding: 12px; color: #9ca3af; border-bottom: 2px solid #f3f4f6; text-transform: uppercase; font-size: 11px; }
-        td { padding: 14px 12px; border-bottom: 1px solid #f3f4f6; }
-        
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        th { text-align: left; padding: 12px; color: #9ca3af; border-bottom: 2px solid #f3f4f6; text-transform: uppercase; font-size: 10px; }
+        td { padding: 12px; border-bottom: 1px solid #f3f4f6; }
+
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .bg-success { background: #ecfdf5; color: #065f46; }
         .bg-danger { background: #fef2f2; color: #991b1b; }
-        .bg-warning { background: #fffbeb; color: #92400e; }
 
-        /* Config Modal */
+        /* Modal */
         #config-modal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
             z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);
         }
-        .modal-body { background: #fff; width: 400px; padding: 32px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .modal-body { background: #fff; width: 400px; padding: 32px; border-radius: 20px; }
         .input-box { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; }
-        .btn-main { padding: 12px 24px; background: var(--primary); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s; }
-        .btn-main:hover { opacity: 0.9; }
+        .btn-main { padding: 12px 24px; background: var(--primary); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; }
 
         #loading-bar { position: fixed; top: 0; left: 0; height: 4px; background: var(--accent); width: 0%; transition: 0.4s; z-index: 2000; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -87,8 +82,8 @@
             <h2 style="font-size: 18px;">ON Digital</h2>
         </div>
         <div class="nav-item active" onclick="switchView('executivo', this)"><i class="fas fa-chart-pie"></i> Executivo</div>
-        <div class="nav-item" onclick="switchView('receber', this)"><i class="fas fa-hand-holding-usd"></i> A Receber (Aging)</div>
-        <div class="nav-item" onclick="switchView('pagar', this)"><i class="fas fa-money-bill-wave"></i> A Pagar (Provisões)</div>
+        <div class="nav-item" onclick="switchView('receber', this)"><i class="fas fa-hand-holding-usd"></i> A Receber</div>
+        <div class="nav-item" onclick="switchView('pagar', this)"><i class="fas fa-money-bill-wave"></i> A Pagar</div>
         <div class="nav-item" onclick="switchView('caixa', this)"><i class="fas fa-exchange-alt"></i> Fluxo de Caixa</div>
     </nav>
 
@@ -96,34 +91,27 @@
         <header>
             <h2 id="view-title">Visão Executiva</h2>
             <div style="display: flex; gap: 12px;">
-                <button class="btn-main" style="background: #fff; color: #374151; border: 1px solid #d1d5db;" onclick="toggleBlur()"><i class="fas fa-eye-slash"></i></button>
-                <button class="btn-main" onclick="document.getElementById('config-modal').style.display='flex'"><i class="fas fa-sync-alt"></i> Sincronizar</button>
+                <button class="btn-main" style="background: #fff; color: #374151; border: 1px solid #d1d5db; width: auto;" onclick="toggleBlur()"><i class="fas fa-eye-slash"></i></button>
+                <button class="btn-main" style="width: auto;" onclick="document.getElementById('config-modal').style.display='flex'"><i class="fas fa-sync-alt"></i> Sincronizar</button>
             </div>
         </header>
 
         <section id="executivo" class="view-section active">
             <div class="kpi-grid">
-                <div class="kpi-card"><label>Liquidez Líquida</label><span class="val blur-target" id="kpi-liquidez">R$ 0,00</span></div>
-                <div class="kpi-card"><label>Aging Atrasado</label><span class="val blur-target" id="kpi-atrasado" style="color:var(--danger)">R$ 0,00</span></div>
-                <div class="kpi-card"><label>Projeção de Entradas</label><span class="val blur-target" id="kpi-projecao">R$ 0,00</span></div>
-                <div class="kpi-card"><label>Taxa de Inadimplência</label><span class="val blur-target" id="kpi-taxa">0,00%</span></div>
+                <div class="kpi-card"><label>Disponível Líquido</label><span class="val blur-target" id="kpi-liquidez">R$ 0,00</span></div>
+                <div class="kpi-card"><label>Total em Atraso</label><span class="val blur-target" id="kpi-atrasado" style="color:var(--danger)">R$ 0,00</span></div>
+                <div class="kpi-card"><label>Projeção Mensal</label><span class="val blur-target" id="kpi-projecao">R$ 0,00</span></div>
+                <div class="kpi-card"><label>Inadimplência</label><span class="val blur-target" id="kpi-taxa">0,00%</span></div>
             </div>
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px;">
-                <div class="card">
-                    <div class="card-title">Fluxo de Caixa Acumulado (Projeção)</div>
-                    <div style="height: 350px;"><canvas id="chart-fluxo-exec"></canvas></div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Distribuição Receita vs Despesa</div>
-                    <div style="height: 350px;"><canvas id="chart-pizza-exec"></canvas></div>
-                </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div class="card"><div class="card-title">Fluxo de Caixa Acumulado</div><div style="height: 300px;"><canvas id="chart-fluxo-exec"></canvas></div></div>
+                <div class="card"><div class="card-title">Receita vs Despesa</div><div style="height: 300px;"><canvas id="chart-pizza-exec"></canvas></div></div>
             </div>
         </section>
 
         <section id="receber" class="view-section">
             <div class="card">
-                <div class="card-title">Envelhecimento da Carteira</div>
-                <div style="height: 250px; margin-bottom: 30px;"><canvas id="chart-aging-detalhe"></canvas></div>
+                <div class="card-title">Títulos a Receber</div>
                 <table>
                     <thead><tr><th>Cliente</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead>
                     <tbody id="table-receber"></tbody>
@@ -133,9 +121,9 @@
 
         <section id="pagar" class="view-section">
             <div class="card">
-                <div class="card-title">Cronograma de Pagamentos</div>
+                <div class="card-title">Títulos a Pagar</div>
                 <table>
-                    <thead><tr><th>Fornecedor</th><th>Categoria</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Fornecedor</th><th>Categoria</th><th>Vencimento</th><th>Valor</th></tr></thead>
                     <tbody id="table-pagar"></tbody>
                 </table>
             </div>
@@ -143,22 +131,21 @@
 
         <section id="caixa" class="view-section">
             <div class="card">
-                <div class="card-title">Saldo Bancário Projetado por Dia</div>
-                <div style="height: 450px;"><canvas id="chart-caixa-detalhado"></canvas></div>
+                <div class="card-title">Evolução do Saldo (Dia a Dia)</div>
+                <div style="height: 400px;"><canvas id="chart-caixa-detalhado"></canvas></div>
             </div>
         </section>
     </div>
 
     <div id="config-modal">
         <div class="modal-body">
-            <h3>Conectar ao Omie</h3>
-            <p style="font-size: 13px; color: #6b7280; margin: 10px 0 20px;">Insira suas credenciais para carregar os dados financeiros reais.</p>
+            <h3 style="color:var(--primary); margin-bottom: 10px;">Conectar Omie</h3>
             <label style="font-size: 11px; font-weight: 700;">APP KEY</label>
-            <input type="text" id="app-key" class="input-box" placeholder="607585...">
+            <input type="text" id="app-key" class="input-box" placeholder="Cole sua Key">
             <label style="font-size: 11px; font-weight: 700;">APP SECRET</label>
             <input type="password" id="app-secret" class="input-box" placeholder="••••••••••••">
-            <button class="btn-main" style="width:100%" onclick="sincronizar()">Sincronizar Dados</button>
-            <button class="btn-main" style="background:none; color:#6b7280; width:100%; margin-top:10px;" onclick="document.getElementById('config-modal').style.display='none'">Cancelar</button>
+            <button class="btn-main" onclick="sincronizar()">Sincronizar Agora</button>
+            <button class="btn-main" style="background:none; color:#6b7280; margin-top:10px;" onclick="document.getElementById('config-modal').style.display='none'">Cancelar</button>
         </div>
     </div>
 
@@ -172,23 +159,10 @@
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            document.getElementById('view-title').textContent = el.textContent;
+            document.getElementById('view-title').textContent = el.innerText;
         }
 
         function toggleBlur() { document.querySelectorAll('.blur-target').forEach(e => e.classList.toggle('blur-val')); }
-
-        async function api(endpoint, call, param) {
-            const res = await fetch(`${RAILWAY_URL}/omie/data`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    endpoint, call, param, 
-                    app_key: document.getElementById('app-key').value, 
-                    app_secret: document.getElementById('app-secret').value 
-                })
-            });
-            return await res.json();
-        }
 
         async function sincronizar() {
             const loader = document.getElementById('loading-bar');
@@ -196,107 +170,88 @@
             loader.style.width = '30%';
             
             try {
+                const key = document.getElementById('app-key').value;
+                const secret = document.getElementById('app-secret').value;
+
+                const fetchOmie = async (endpoint, call) => {
+                    const res = await fetch(`${RAILWAY_URL}/omie/data`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ endpoint, call, param: { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' }, app_key: key, app_secret: secret })
+                    });
+                    return await res.json();
+                };
+
                 const [rec, pag] = await Promise.all([
-                    api('financas/contareceber', 'ListarContasReceber', { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' }),
-                    api('financas/contapagar', 'ListarContasPagar', { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' })
+                    fetchOmie('financas/contareceber', 'ListarContasReceber'),
+                    fetchOmie('financas/contapagar', 'ListarContasPagar')
                 ]);
+
                 loader.style.width = '80%';
                 processar(rec, pag);
                 loader.style.width = '100%';
                 setTimeout(() => loader.style.width = '0', 500);
-            } catch (e) { alert("Erro ao conectar ao servidor Railway."); loader.style.width = '0'; }
+            } catch (e) { alert("Erro de conexão com o Railway."); loader.style.width = '0'; }
         }
 
         function processar(rec, pag) {
-            let totalRec = 0, totalPag = 0, atrasado = 0;
+            let tRec = 0, tPag = 0, tAtraso = 0;
             const hoje = new Date();
-            const movDiaria = {}; 
+            const movDiaria = {};
 
-            // Processar Receber
-            const listRec = (rec.conta_receber_cadastro || []).map(i => {
-                const v = parseFloat(i.valor_documento || 0);
+            const lRec = (rec.conta_receber_cadastro || []).map(i => {
+                const v = parseFloat(i.valor_documento || 0); tRec += v;
                 const dt = i.data_vencimento;
-                totalRec += v;
                 movDiaria[dt] = (movDiaria[dt] || 0) + v;
                 const d = new Date(dt.split('/').reverse().join('-'));
-                if (d < hoje && i.status_titulo !== 'RECEBIDO') atrasado += v;
+                if (d < hoje && i.status_titulo !== 'RECEBIDO') tAtraso += v;
                 return i;
             });
 
-            // Processar Pagar
-            const listPag = (pag.conta_pagar_cadastro || []).map(i => {
-                const v = parseFloat(i.valor_documento || 0);
+            const lPag = (pag.conta_pagar_cadastro || []).map(i => {
+                const v = parseFloat(i.valor_documento || 0); tPag += v;
                 const dt = i.data_vencimento;
-                totalPag += v;
                 movDiaria[dt] = (movDiaria[dt] || 0) - v;
                 return i;
             });
 
-            // Ordenar Datas Cronologicamente para o Fluxo
-            const datasSorted = Object.keys(movDiaria).sort((a,b) => {
-                return new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'));
-            });
-
-            let saldoAcumulado = 0;
-            const labelsFluxo = [];
-            const valoresFluxo = [];
-            
-            datasSorted.forEach(dt => {
-                saldoAcumulado += movDiaria[dt];
-                labelsFluxo.push(dt);
-                valoresFluxo.push(saldoAcumulado);
-            });
-
-            // Update UI
-            document.getElementById('kpi-liquidez').textContent = fmt(totalRec - totalPag);
-            document.getElementById('kpi-atrasado').textContent = fmt(atrasado);
-            document.getElementById('kpi-taxa').textContent = ((atrasado/totalRec)*100).toFixed(2) + '%';
-            document.getElementById('kpi-projecao').textContent = fmt(totalRec);
+            // Atualiza UI
+            document.getElementById('kpi-liquidez').textContent = fmt(tRec - tPag);
+            document.getElementById('kpi-atrasado').textContent = fmt(tAtraso);
+            document.getElementById('kpi-projecao').textContent = fmt(tRec);
+            document.getElementById('kpi-taxa').textContent = ((tAtraso/tRec)*100).toFixed(2) + '%';
 
             // Tabelas
-            document.getElementById('table-receber').innerHTML = listRec.slice(0,15).map(i => `
-                <tr><td>${i.nome_cliente || '---'}</td><td>${i.data_vencimento}</td><td style="font-weight:700">${fmt(i.valor_documento)}</td><td><span class="badge ${i.status_titulo === 'ABERTO' ? 'bg-warning' : 'bg-success'}">${i.status_titulo}</span></td></tr>
-            `).join('');
+            document.getElementById('table-receber').innerHTML = lRec.slice(0,10).map(i => `<tr><td>${i.nome_cliente}</td><td>${i.data_vencimento}</td><td>${fmt(i.valor_documento)}</td><td><span class="badge bg-success">${i.status_titulo}</span></td></tr>`).join('');
+            document.getElementById('table-pagar').innerHTML = lPag.slice(0,10).map(i => `<tr><td>${i.nome_fornecedor}</td><td>${i.cod_categoria}</td><td>${i.data_vencimento}</td><td style="color:var(--danger)">${fmt(i.valor_documento)}</td></tr>`).join('');
 
-            document.getElementById('table-pagar').innerHTML = listPag.slice(0,15).map(i => `
-                <tr><td>${i.nome_fornecedor || '---'}</td><td>${i.cod_categoria}</td><td>${i.data_vencimento}</td><td style="font-weight:700; color:var(--danger)">${fmt(i.valor_documento)}</td><td><span class="badge bg-danger">ABERTO</span></td></tr>
-            `).join('');
+            // Gráficos
+            const labels = Object.keys(movDiaria).sort((a,b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-')));
+            let acum = 0;
+            const valores = labels.map(l => { acum += movDiaria[l]; return acum; });
 
-            renderCharts(labelsFluxo, valoresFluxo, totalRec, totalPag);
+            renderCharts(labels, valores, tRec, tPag);
         }
 
         function renderCharts(labels, valores, r, p) {
-            // Chart Executivo (Linha)
-            if(charts.fluxoEx) charts.fluxoEx.destroy();
-            charts.fluxoEx = new Chart(document.getElementById('chart-fluxo-exec'), {
+            if(charts.fEx) charts.fEx.destroy();
+            charts.fEx = new Chart(document.getElementById('chart-fluxo-exec'), {
                 type: 'line',
-                data: { labels, datasets: [{ label: 'Saldo Projetado', data: valores, borderColor: '#5c1896', backgroundColor: 'rgba(92,24,150,0.05)', fill: true, tension: 0.3 }] },
+                data: { labels, datasets: [{ label: 'Saldo Acumulado', data: valores, borderColor: '#5c1896', fill: true, backgroundColor: 'rgba(92,24,150,0.1)', tension: 0.3 }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Chart Pizza
-            if(charts.pizza) charts.pizza.destroy();
-            charts.pizza = new Chart(document.getElementById('chart-pizza-exec'), {
+            if(charts.pEx) charts.pEx.destroy();
+            charts.pEx = new Chart(document.getElementById('chart-pizza-exec'), {
                 type: 'doughnut',
-                data: { labels: ['Receber', 'Pagar'], datasets: [{ data: [r, p], backgroundColor: ['#00a99d', '#ef4444'], borderWidth: 0 }] },
+                data: { labels: ['Entradas', 'Saídas'], datasets: [{ data: [r, p], backgroundColor: ['#00a99d', '#ef4444'] }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
             });
 
-            // Chart Fluxo Detalhado (Aba Fluxo)
-            if(charts.caixaDet) charts.caixaDet.destroy();
-            charts.caixaDet = new Chart(document.getElementById('chart-caixa-detalhado'), {
+            if(charts.fDet) charts.fDet.destroy();
+            charts.fDet = new Chart(document.getElementById('chart-caixa-detalhado'), {
                 type: 'line',
-                data: { 
-                    labels, 
-                    datasets: [{ 
-                        label: 'Evolução de Caixa Real', 
-                        data: valores, 
-                        borderColor: '#00a99d', 
-                        borderWidth: 3, 
-                        pointBackgroundColor: '#00a99d',
-                        fill: false
-                    }] 
-                },
+                data: { labels, datasets: [{ label: 'Evolução de Caixa', data: valores, borderColor: '#00a99d', borderWidth: 3, pointRadius: 4 }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
         }
