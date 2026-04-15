@@ -3,195 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive BI | ON Digital</title>
+    <title>BI Estratégico | ON Digital</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         :root {
-            --primary: #5c1896; /* Roxo ON */
-            --accent: #00a99d;  /* Ciano ON */
-            --danger: #e63946;
-            --success: #2a9d8f;
-            --bg: #f8f9fc;
-            --text: #2d3436;
+            --primary: #5c1896;
+            --accent: #00a99d;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg: #f3f4f6;
+            --sidebar: #1e1b4b;
+            --white: #ffffff;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Barra Lateral e Header */
-        .wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        /* Sidebar Navigation */
+        .sidebar { width: 260px; background: var(--sidebar); color: #fff; display: flex; flex-direction: column; padding: 20px; }
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding-left: 10px; }
+        .logo-img { height: 35px; }
+        .nav-item { 
+            padding: 14px 18px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; 
+            gap: 12px; font-size: 14px; font-weight: 500; margin-bottom: 8px; transition: 0.2s; color: #a5b4fc;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .nav-item.active { background: var(--primary); color: #fff; }
+
+        /* Content Area */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         header { 
-            background: #fff; padding: 15px 40px; display: flex; justify-content: space-between; 
-            align-items: center; border-bottom: 1px solid #e1e4e8; position: sticky; top: 0; z-index: 100;
+            background: #fff; padding: 16px 40px; display: flex; justify-content: space-between; 
+            align-items: center; border-bottom: 1px solid #e5e7eb;
         }
-        .logo-box { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 40px; }
-        
-        /* Botões de Ação */
-        .actions { display: flex; gap: 12px; }
-        .btn { 
-            padding: 10px 18px; border-radius: 8px; border: 1px solid #ddd; 
-            background: #fff; cursor: pointer; font-size: 13px; font-weight: 600; 
-            display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-        }
-        .btn:hover { background: #f1f3f5; border-color: var(--primary); }
-        .btn-sync { background: var(--primary); color: #fff; border: none; }
-        .btn-sync:hover { opacity: 0.9; }
-
-        /* Layout Principal */
-        main { padding: 30px 40px; max-width: 1600px; margin: 0 auto; width: 100%; }
+        .view-section { display: none; padding: 30px 40px; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
 
         /* KPI Cards */
-        .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { 
-            background: #fff; padding: 25px; border-radius: 16px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #edf2f7;
-            position: relative; transition: transform 0.2s;
-        }
-        .kpi-card:hover { transform: translateY(-3px); }
-        .kpi-card label { font-size: 12px; font-weight: 700; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; }
-        .kpi-card .val { font-size: 26px; font-weight: 800; margin-top: 10px; display: block; color: var(--primary); }
-        .kpi-card .trend { font-size: 11px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
-        .up { color: var(--success); } .down { color: var(--danger); }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #f3f4f6; }
+        .kpi-card label { font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; }
+        .kpi-card .val { font-size: 24px; font-weight: 800; margin-top: 8px; display: block; color: var(--sidebar); }
+        .blur-val { filter: blur(6px); }
 
-        /* Gráficos */
-        .grid-charts { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
-        @media (max-width: 1024px) { .grid-charts { grid-template-columns: 1fr; } }
-        
-        .card { background: #fff; padding: 25px; border-radius: 16px; border: 1px solid #edf2f7; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        /* Tables & Charts */
+        .card { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 25px; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 15px; font-weight: 700; color: var(--primary); }
-
-        /* Tabelas */
-        .table-resumo { width: 100%; border-collapse: collapse; }
-        .table-resumo th { text-align: left; font-size: 11px; text-transform: uppercase; color: #a0aec0; padding: 12px; border-bottom: 2px solid #f7fafc; }
-        .table-resumo td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #f7fafc; }
+        .card-title { font-size: 16px; font-weight: 700; color: var(--sidebar); }
         
-        .status-pill { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .bg-rec { background: #e6fffa; color: #2c7a7b; }
-        .bg-pag { background: #fff5f5; color: #c53030; }
-
-        /* Config Panel Overlay */
-        #config-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.5); z-index: 1000; backdrop-filter: blur(4px);
-        }
-        .config-modal { 
-            background: #fff; width: 380px; margin: 100px auto; padding: 30px; 
-            border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
-        }
-        .input-box { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 12px; color: #9ca3af; border-bottom: 2px solid #f3f4f6; text-transform: uppercase; font-size: 11px; }
+        td { padding: 14px 12px; border-bottom: 1px solid #f3f4f6; }
         
-        #loading-bar { position: fixed; top: 0; left: 0; height: 4px; background: var(--accent); width: 0%; transition: 0.4s; z-index: 2000; }
-        .blur-val { filter: blur(6px); user-select: none; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+        .bg-success { background: #ecfdf5; color: #065f46; }
+        .bg-danger { background: #fef2f2; color: #991b1b; }
+        .bg-warning { background: #fffbeb; color: #92400e; }
+
+        /* Modals */
+        #config-modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
+            z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+        }
+        .modal-body { background: #fff; width: 400px; padding: 32px; border-radius: 20px; }
+        .input-box { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #d1d5db; border-radius: 8px; }
+        .btn-main { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <div id="loading-bar"></div>
-    
-    <div class="wrapper">
+
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <img src="logo.png" class="logo-img" alt="ON Digital" onerror="this.src='https://via.placeholder.com/35'">
+            <h2 style="font-size: 18px;">ON Digital</h2>
+        </div>
+        <div class="nav-item active" onclick="switchView('executivo', this)"><i class="fas fa-chart-pie"></i> Executivo</div>
+        <div class="nav-item" onclick="switchView('receber', this)"><i class="fas fa-hand-holding-usd"></i> A Receber (Aging)</div>
+        <div class="nav-item" onclick="switchView('pagar', this)"><i class="fas fa-money-bill-wave"></i> A Pagar (Provisões)</div>
+        <div class="nav-item" onclick="switchView('caixa', this)"><i class="fas fa-exchange-alt"></i> Fluxo de Caixa</div>
+    </nav>
+
+    <div class="main-content">
         <header>
-            <div class="logo-box">
-                <img src="logo.png" class="logo-img" alt="ON Digital" onerror="this.src='https://via.placeholder.com/40x40?text=ON'">
-                <div>
-                    <h1 style="font-size: 18px; letter-spacing: -0.5px;">ON Digital</h1>
-                    <span style="font-size: 10px; font-weight: 700; color: #a0aec0; text-transform: uppercase;">CEO Strategic Dashboard</span>
-                </div>
-            </div>
-            <div class="actions">
-                <button class="btn" onclick="toggleBlur()"><i class="fas fa-eye-slash"></i> Modo Privado</button>
-                <button class="btn btn-sync" onclick="toggleConfig()"><i class="fas fa-sync-alt"></i> Atualizar Dados</button>
+            <h2 id="view-title">Visão Executiva</h2>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-main" style="background: #fff; color: #374151; border: 1px solid #d1d5db; width: auto; padding: 8px 16px;" onclick="toggleBlur()"><i class="fas fa-eye-slash"></i></button>
+                <button class="btn-main" style="width: auto; padding: 8px 16px;" onclick="document.getElementById('config-modal').style.display='flex'"><i class="fas fa-sync-alt"></i> Sincronizar</button>
             </div>
         </header>
 
-        <main>
-            <div class="kpi-container">
-                <div class="kpi-card">
-                    <label>Disponibilidade Bruta</label>
-                    <span class="val blur-target" id="kpi-receber">R$ 0,00</span>
-                    <div class="trend up"><i class="fas fa-caret-up"></i> <span>A Receber em Aberto</span></div>
-                </div>
-                <div class="kpi-card">
-                    <label>Compromissos</label>
-                    <span class="val blur-target" id="kpi-pagar" style="color: var(--danger)">R$ 0,00</span>
-                    <div class="trend down"><i class="fas fa-caret-down"></i> <span>A Pagar em Aberto</span></div>
-                </div>
-                <div class="kpi-card">
-                    <label>Liquidez Líquida</label>
-                    <span class="val blur-target" id="kpi-saldo">R$ 0,00</span>
-                    <div class="trend" id="liquidez-status">--</div>
-                </div>
-                <div class="kpi-card">
-                    <label>Risco de Inadimplência</label>
-                    <span class="val blur-target" id="kpi-atraso" style="color: #d63031">0,00%</span>
-                    <div class="trend"><i class="fas fa-exclamation-triangle"></i> <span>Títulos Vencidos</span></div>
-                </div>
+        <section id="executivo" class="view-section active">
+            <div class="kpi-grid">
+                <div class="kpi-card"><label>Liquidez Imediata</label><span class="val blur-target" id="kpi-liquidez">R$ 0,00</span></div>
+                <div class="kpi-card"><label>Aging Atrasado</label><span class="val blur-target" id="kpi-atrasado" style="color:var(--danger)">R$ 0,00</span></div>
+                <div class="kpi-card"><label>Projeção Mensal</label><span class="val blur-target" id="kpi-projecao">R$ 0,00</span></div>
+                <div class="kpi-card"><label>Inadimplência</label><span class="val blur-target" id="kpi-taxa">0,00%</span></div>
             </div>
-
-            <div class="grid-charts">
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Fluxo de Caixa e Projeção</span>
-                    </div>
-                    <div style="height: 350px;"><canvas id="chart-fluxo"></canvas></div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Composição de Carteira</span></div>
-                    <div style="height: 350px;"><canvas id="chart-pizza"></canvas></div>
-                </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px;">
+                <div class="card"><div class="card-title">Fluxo de Caixa Acumulado</div><div style="height: 350px;"><canvas id="chart-fluxo"></canvas></div></div>
+                <div class="card"><div class="card-title">Composição de Gastos</div><div style="height: 350px;"><canvas id="chart-pizza"></canvas></div></div>
             </div>
+        </section>
 
+        <section id="receber" class="view-section">
             <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Movimentações de Alto Valor</span>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="table-resumo">
-                        <thead>
-                            <tr><th>Data</th><th>Parceiro de Negócio</th><th>Categoria</th><th>Valor</th><th>Status</th></tr>
-                        </thead>
-                        <tbody id="table-body">
-                            <tr><td colspan="5" style="text-align:center; padding:50px; color:#a0aec0;">Clique em "Atualizar Dados" para sincronizar com o Omie.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div class="card-title">Análise de Envelhecimento (Aging)</div>
+                <div style="height: 250px; margin-bottom: 30px;"><canvas id="chart-aging-rec"></canvas></div>
+                <table>
+                    <thead><tr><th>Cliente</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead>
+                    <tbody id="table-receber"></tbody>
+                </table>
             </div>
-        </main>
+        </section>
+
+        <section id="pagar" class="view-section">
+            <div class="card">
+                <div class="card-title">Compromissos e Provisões</div>
+                <table>
+                    <thead><tr><th>Fornecedor</th><th>Categoria</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead>
+                    <tbody id="table-pagar"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="caixa" class="view-section">
+            <div class="card">
+                <div class="card-title">Projeção Diária (Entradas vs Saídas)</div>
+                <div style="height: 400px;"><canvas id="chart-caixa-detalhado"></canvas></div>
+            </div>
+        </section>
     </div>
 
-    <div id="config-overlay">
-        <div class="config-modal">
-            <h3 style="margin-bottom: 20px; color: var(--primary);">Autenticação Omie</h3>
-            <label style="font-size: 11px; font-weight: 800; color: #636e72;">APP KEY</label>
-            <input type="text" id="app-key" class="input-box" placeholder="Cole sua chave aqui...">
-            <label style="font-size: 11px; font-weight: 800; color: #636e72;">APP SECRET</label>
-            <input type="password" id="app-secret" class="input-box" placeholder="••••••••••••">
-            <button class="btn btn-sync" style="width: 100%; justify-content: center; padding: 14px;" onclick="sincronizar()">
-                COMEÇAR SINCRONIZAÇÃO
-            </button>
-            <button class="btn" style="width: 100%; justify-content: center; margin-top: 10px; border: none;" onclick="toggleConfig()">
-                Cancelar
-            </button>
+    <div id="config-modal">
+        <div class="modal-body">
+            <h3>Credenciais Omie</h3>
+            <p style="font-size: 12px; color: #6b7280; margin: 8px 0 20px;">Insira suas chaves para atualizar os relatórios em tempo real.</p>
+            <label style="font-size: 11px; font-weight: 700;">APP KEY</label>
+            <input type="text" id="app-key" class="input-box">
+            <label style="font-size: 11px; font-weight: 700;">APP SECRET</label>
+            <input type="password" id="app-secret" class="input-box">
+            <button class="btn-main" onclick="sincronizar()">Sincronizar Agora</button>
+            <button class="btn-main" style="background:none; color:#6b7280; margin-top:10px;" onclick="document.getElementById('config-modal').style.display='none'">Fechar</button>
         </div>
     </div>
 
     <script>
         const RAILWAY_URL = 'https://web-production-62be6.up.railway.app';
         let charts = {};
-
-        function toggleConfig() { 
-            const el = document.getElementById('config-overlay');
-            el.style.display = el.style.display === 'block' ? 'none' : 'block';
-        }
-        
-        function toggleBlur() { 
-            document.querySelectorAll('.blur-target').forEach(el => el.classList.toggle('blur-val'));
-        }
-
         const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
-        async function fetchOmie(endpoint, call, param) {
+        function switchView(id, el) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            document.getElementById('view-title').textContent = el.textContent;
+        }
+
+        function toggleBlur() { document.querySelectorAll('.blur-target').forEach(e => e.classList.toggle('blur-val')); }
+
+        async function api(endpoint, call, param) {
             const res = await fetch(`${RAILWAY_URL}/omie/data`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -205,97 +180,74 @@
         }
 
         async function sincronizar() {
-            const loader = document.getElementById('loading-bar');
-            loader.style.width = '30%';
-            toggleConfig();
-
+            document.getElementById('config-modal').style.display = 'none';
             try {
                 const [rec, pag] = await Promise.all([
-                    fetchOmie('financas/contareceber', 'ListarContasReceber', { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' }),
-                    fetchOmie('financas/contapagar', 'ListarContasPagar', { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' })
+                    api('financas/contareceber', 'ListarContasReceber', { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' }),
+                    api('financas/contapagar', 'ListarContasPagar', { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' })
                 ]);
-
-                loader.style.width = '80%';
-                processarDashboard(rec, pag);
-                loader.style.width = '100%';
-                setTimeout(() => loader.style.width = '0', 500);
-            } catch (e) {
-                alert("Falha na sincronização. Verifique suas credenciais.");
-                loader.style.width = '0';
-            }
+                processar(rec, pag);
+            } catch (e) { alert("Erro ao conectar."); }
         }
 
-        function processarDashboard(rec, pag) {
-            let sumRec = 0, sumPag = 0, sumAtraso = 0;
+        function processar(rec, pag) {
+            let totalRec = 0, totalPag = 0, atrasado = 0;
             const hoje = new Date();
-            const rows = [];
-            const aging = { 'Atrasado': 0, 'À Vencer': 0 };
+            const aging = { 'Atrasado': 0, '1-7 dias': 0, '8-15 dias': 0, '+15 dias': 0 };
 
-            (rec.conta_receber_cadastro || []).forEach(i => {
-                const v = parseFloat(i.valor_documento || 0);
-                sumRec += v;
-                const venc = new Date(i.data_vencimento.split('/').reverse().join('-'));
-                if (venc < hoje && i.status_titulo !== 'RECEBIDO') sumAtraso += v;
-                
-                rows.push({ d: i.data_vencimento, n: i.nome_cliente, v: v, t: 'rec', st: i.status_titulo });
+            const listRec = (rec.conta_receber_cadastro || []).map(i => {
+                const v = parseFloat(i.valor_documento || 0); totalRec += v;
+                const d = new Date(i.data_vencimento.split('/').reverse().join('-'));
+                const diff = Math.ceil((d - hoje) / 86400000);
+                if (diff < 0) { atrasado += v; aging['Atrasado'] += v; }
+                else if (diff <= 7) aging['1-7 dias'] += v;
+                else if (diff <= 15) aging['8-15 dias'] += v;
+                else aging['+15 dias'] += v;
+                return i;
             });
 
-            (pag.conta_pagar_cadastro || []).forEach(i => {
-                const v = parseFloat(i.valor_documento || 0);
-                sumPag += v;
-                rows.push({ d: i.data_vencimento, n: i.nome_fornecedor, v: -v, t: 'pag', st: i.status_titulo });
+            const listPag = (pag.conta_pagar_cadastro || []).map(i => {
+                totalPag += parseFloat(i.valor_documento || 0);
+                return i;
             });
 
-            // Update KPIs
-            document.getElementById('kpi-receber').textContent = fmt(sumRec);
-            document.getElementById('kpi-pagar').textContent = fmt(sumPag);
-            document.getElementById('kpi-saldo').textContent = fmt(sumRec - sumPag);
-            const taxa = (sumAtraso / sumRec * 100).toFixed(2);
-            document.getElementById('kpi-atraso').textContent = taxa + '%';
+            // KPIs
+            document.getElementById('kpi-liquidez').textContent = fmt(totalRec - totalPag);
+            document.getElementById('kpi-atrasado').textContent = fmt(atrasado);
+            document.getElementById('kpi-taxa').textContent = ((atrasado/totalRec)*100).toFixed(2) + '%';
+            document.getElementById('kpi-projecao').textContent = fmt(totalRec);
 
             // Tabelas
-            rows.sort((a,b) => b.d.split('/').reverse().join('') - a.d.split('/').reverse().join(''));
-            document.getElementById('table-body').innerHTML = rows.slice(0, 10).map(i => `
-                <tr>
-                    <td>${i.d}</td>
-                    <td><strong>${i.n || '---'}</strong></td>
-                    <td>Financeiro</td>
-                    <td style="font-weight:700; color:${i.v < 0 ? 'var(--danger)' : 'var(--primary)'}">${fmt(i.v)}</td>
-                    <td><span class="status-pill ${i.t === 'rec' ? 'bg-rec' : 'bg-pag'}">${i.st}</span></td>
-                </tr>
+            document.getElementById('table-receber').innerHTML = listRec.slice(0,10).map(i => `
+                <tr><td>${i.nome_cliente}</td><td>${i.data_vencimento}</td><td style="font-weight:700">${fmt(i.valor_documento)}</td><td><span class="badge ${i.status_titulo === 'ABERTO' ? 'bg-warning' : 'bg-success'}">${i.status_titulo}</span></td></tr>
             `).join('');
 
-            renderCharts(sumRec, sumPag, sumAtraso);
+            document.getElementById('table-pagar').innerHTML = listPag.slice(0,10).map(i => `
+                <tr><td>${i.nome_fornecedor}</td><td>${i.cod_categoria}</td><td>${i.data_vencimento}</td><td style="font-weight:700; color:var(--danger)">${fmt(i.valor_documento)}</td><td><span class="badge bg-danger">PENDENTE</span></td></tr>
+            `).join('');
+
+            renderCharts(aging, totalRec, totalPag);
         }
 
-        function renderCharts(r, p, a) {
+        function renderCharts(aging, r, p) {
             if(charts.fluxo) charts.fluxo.destroy();
-            if(charts.pizza) charts.pizza.destroy();
-
-            // Chart 1: Fluxo
             charts.fluxo = new Chart(document.getElementById('chart-fluxo'), {
                 type: 'line',
-                data: {
-                    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-                    datasets: [
-                        { label: 'Entradas', data: [r*0.2, r*0.5, r*0.8, r], borderColor: '#00a99d', tension: 0.4, fill: true, backgroundColor: 'rgba(0,169,157,0.05)' },
-                        { label: 'Saídas', data: [p*0.1, p*0.4, p*0.7, p], borderColor: '#e63946', tension: 0.4 }
-                    ]
-                },
+                data: { labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'], datasets: [{ label: 'Saldo Projetado', data: [r*0.3, r*0.5, r*0.8, r-p], borderColor: '#5c1896', tension: 0.4, fill: true, backgroundColor: 'rgba(92,24,150,0.05)' }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Chart 2: Composição
+            if(charts.aging) charts.aging.destroy();
+            charts.aging = new Chart(document.getElementById('chart-aging-rec'), {
+                type: 'bar',
+                data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ['#ef4444', '#f59e0b', '#00a99d', '#5c1896'], borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            if(charts.pizza) charts.pizza.destroy();
             charts.pizza = new Chart(document.getElementById('chart-pizza'), {
                 type: 'doughnut',
-                data: {
-                    labels: ['A Receber (Ok)', 'A Receber (Atraso)', 'A Pagar'],
-                    datasets: [{
-                        data: [r-a, a, p],
-                        backgroundColor: ['#5c1896', '#fab1a0', '#e63946'],
-                        borderWidth: 0
-                    }]
-                },
+                data: { labels: ['A Receber', 'A Pagar'], datasets: [{ data: [r, p], backgroundColor: ['#00a99d', '#ef4444'], borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
             });
         }
