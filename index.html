@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BI Financeiro | ON Digital</title>
+    <title>BI Financeiro ON Digital</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
@@ -16,137 +16,132 @@
             --text-main: #1a0f3c;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: var(--bg); color: var(--text-main); padding: 20px; }
         
-        /* Efeito Modo Privado */
-        .hidden-val { filter: blur(7px); pointer-events: none; user-select: none; }
+        /* Navigation Tabs */
+        .nav-tabs { display: flex; gap: 5px; margin-bottom: 25px; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .tab-btn { padding: 10px 20px; border: none; background: none; cursor: pointer; font-weight: 700; color: #888; border-radius: 8px; transition: 0.3s; font-size: 13px; text-transform: uppercase; }
+        .tab-btn.active { background: var(--primary); color: #fff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 25px; background: #fff; padding: 15px 30px; 
-            border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-        }
-        .logo-wrap { display: flex; align-items: center; gap: 15px; }
-        .logo-img { height: 50px; width: auto; max-width: 180px; object-fit: contain; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .logo-img { height: 45px; margin-right: 10px; }
         
-        /* Fallback caso a imagem não carregue */
-        .logo-fallback { 
-            width: 50px; height: 50px; background: var(--primary); 
-            border-radius: 10px; display: none; align-items: center; 
-            justify-content: center; color: var(--accent); font-weight: 900; font-size: 22px;
-        }
-
-        .nav-actions { display: flex; gap: 10px; }
-        .btn-ui { 
-            background: #fff; border: 1px solid #ddd; padding: 8px 15px; 
-            border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
-            display: flex; align-items: center; gap: 8px; transition: 0.2s;
-        }
-        .btn-ui:hover { background: #f8f9fa; border-color: var(--primary); }
-
-        .config-panel {
-            display: none; position: fixed; top: 90px; right: 20px; 
-            background: #fff; padding: 25px; border-radius: 15px; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 1000; width: 340px;
-        }
-        .config-panel.active { display: block; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .input-box { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-        .btn-primary { 
-            width: 100%; padding: 12px; background: var(--primary); color: #fff; 
-            border: none; border-radius: 8px; cursor: pointer; font-weight: 700;
-        }
-
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 25px; }
-        .kpi-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 6px solid #ddd; }
-        .kpi-card.purple { border-color: var(--primary); }
-        .kpi-card.orange { border-color: var(--secondary); }
-        .kpi-card.cyan { border-color: var(--accent); }
+        .btn-ui { background: #fff; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+        
+        /* Config Panel */
+        .config-panel { display: none; position: fixed; top: 90px; right: 20px; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 1000; width: 340px; }
+        .config-panel.active { display: block; }
+        .input-box { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #ddd; border-radius: 8px; }
+        
+        /* Grid & Cards */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: #fff; padding: 20px; border-radius: 12px; border-left: 6px solid #ddd; }
         .kpi-card label { font-size: 11px; color: #888; font-weight: 800; text-transform: uppercase; }
-        .kpi-card .value { font-size: 26px; font-weight: 800; margin-top: 5px; display: block; }
+        .kpi-card .value { font-size: 22px; font-weight: 800; margin-top: 5px; display: block; }
+        
+        .card { background: #fff; padding: 25px; border-radius: 12px; margin-bottom: 20px; }
+        .card-title { font-size: 14px; font-weight: 800; color: var(--primary); margin-bottom: 20px; text-transform: uppercase; }
 
-        .main-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 25px; }
-        @media (max-width: 1100px) { .main-layout { grid-template-columns: 1fr; } }
-
-        .card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-
-        .table-area { overflow-x: auto; max-height: 450px; }
+        /* Tables */
+        .table-area { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px 10px; color: #aaa; font-size: 10px; border-bottom: 2px solid #f0f0f0; text-transform: uppercase; }
-        td { padding: 12px 10px; border-bottom: 1px solid #f9f9f9; font-size: 13px; }
-        .pill { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
-        .rec { background: #f0f7f7; color: var(--accent); }
-        .pag { background: #fff3f1; color: var(--secondary); }
-
+        th { text-align: left; padding: 12px; font-size: 11px; color: #aaa; border-bottom: 2px solid #f0f0f0; }
+        td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f9f9f9; }
+        
+        .dre-row-main { background: #f8f9fa; font-weight: 800; }
+        .dre-positive { color: var(--accent); }
+        .dre-negative { color: var(--secondary); }
+        
         #loading-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); width: 0%; transition: 0.4s; z-index: 2000; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
     <div id="loading-bar"></div>
+    
     <header>
-        <div class="logo-wrap">
-            <img src="logo.png" class="logo-img" alt="ON Digital" id="main-logo" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
-            <div id="logo-fallback" class="logo-fallback">ON</div>
-            <div>
-                <h2 style="color: var(--primary); letter-spacing: -1px; margin-bottom: 2px;">ON Digital</h2>
-                <p style="font-size: 10px; color: #aaa; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Inteligência Financeira</p>
-            </div>
+        <div style="display: flex; align-items: center;">
+            <img src="logo.png" class="logo-img" alt="ON Digital" onerror="this.style.display='none'">
+            <h2 style="color: var(--primary); letter-spacing: -1px;">ON Digital <span style="font-weight: 300; font-size: 14px; color: #aaa;">| BUSINESS INTELLIGENCE</span></h2>
         </div>
-        <div class="nav-actions">
-            <button class="btn-ui" onclick="toggleBlur()"><i class="fas fa-eye-slash"></i> Modo Privado</button>
-            <button class="btn-ui" onclick="toggleConfig()"><i class="fas fa-cog"></i> Configurar Conexão</button>
-        </div>
+        <button class="btn-ui" onclick="toggleConfig()"><i class="fas fa-cog"></i> Configurar</button>
     </header>
 
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('geral', this)">Visão Geral</button>
+        <button class="tab-btn" onclick="switchTab('dre', this)">DRE Simplificado</button>
+        <button class="tab-btn" onclick="switchTab('clientes', this)">Análise de Clientes</button>
+    </div>
+
     <div class="config-panel" id="config-menu">
-        <h4 style="margin-bottom: 15px; color: var(--primary);">Credenciais Omie</h4>
-        <label style="font-size: 10px; font-weight: 800; color: #666;">CHAVE DO APLICATIVO (KEY)</label>
-        <input type="text" id="app-key" class="input-box" placeholder="Insira sua App Key">
-        <label style="font-size: 10px; font-weight: 800; color: #666;">SEGREDO (SECRET)</label>
-        <input type="password" id="app-secret" class="input-box" placeholder="••••••••••••">
-        <button class="btn-primary" id="btn-sync" onclick="carregarDados()">SINCRONIZAR DASHBOARD</button>
+        <label style="font-size: 10px; font-weight: 800;">APP KEY</label>
+        <input type="text" id="app-key" class="input-box" placeholder="Chave Omie">
+        <label style="font-size: 10px; font-weight: 800;">APP SECRET</label>
+        <input type="password" id="app-secret" class="input-box" placeholder="Segredo Omie">
+        <button style="width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 800;" onclick="carregarDados()">SINCRONIZAR TUDO</button>
     </div>
 
-    <div class="summary-grid">
-        <div class="kpi-card purple"><label>A Receber Total</label><span class="value val-data" id="kpi-rec">R$ 0,00</span></div>
-        <div class="kpi-card orange"><label>A Pagar Total</label><span class="value val-data" id="kpi-pag">R$ 0,00</span></div>
-        <div class="kpi-card cyan"><label>Saldo Líquido</label><span class="value val-data" id="kpi-saldo">R$ 0,00</span></div>
-        <div class="kpi-card"><label>Ticket Médio (REC)</label><span class="value val-data" id="kpi-ticket">R$ 0,00</span></div>
-    </div>
-
-    <div class="main-layout">
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Previsão de Recebimento (Aging)</span>
-            </div>
-            <div style="height: 340px;"><canvas id="chart-main"></canvas></div>
+    <div id="tab-geral" class="tab-content active">
+        <div class="summary-grid">
+            <div class="kpi-card" style="border-color: var(--primary);"><label>Receber (Mês)</label><span class="value" id="kpi-rec">R$ 0,00</span></div>
+            <div class="kpi-card" style="border-color: var(--secondary);"><label>Pagar (Mês)</label><span class="value" id="kpi-pag">R$ 0,00</span></div>
+            <div class="kpi-card" style="border-color: var(--accent);"><label>Saldo Líquido</label><span class="value" id="kpi-saldo">R$ 0,00</span></div>
         </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+            <div class="card">
+                <div class="card-title">Envelhecimento de Contas (Aging)</div>
+                <div style="height: 300px;"><canvas id="chart-aging"></canvas></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Últimos Lançamentos</div>
+                <div class="table-area">
+                    <table>
+                        <thead><tr><th>DATA</th><th>DESCRIÇÃO</th><th>VALOR</th></tr></thead>
+                        <tbody id="table-geral"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-dre" class="tab-content">
         <div class="card">
-            <div class="card-header"><span class="card-title">Últimos Lançamentos</span></div>
+            <div class="card-title">Demonstrativo de Resultados (DRE) - Período Atual</div>
             <div class="table-area">
                 <table>
-                    <thead><tr><th>VENCIMENTO</th><th>PARCEIRO</th><th>VALOR</th></tr></thead>
-                    <tbody id="table-body">
-                        <tr><td colspan="3" style="text-align:center; padding:100px; color:#ccc;">Abra as configurações para sincronizar.</td></tr>
+                    <tbody id="table-dre">
+                        <tr><td colspan="2" style="text-align:center; padding:50px; color:#ccc;">Sincronize para calcular o DRE.</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <div id="tab-clientes" class="tab-content">
+        <div class="card">
+            <div class="card-title">Ranking de Volume por Cliente</div>
+            <div style="height: 400px;"><canvas id="chart-clientes"></canvas></div>
+        </div>
+    </div>
+
     <script>
         const RAILWAY_URL = 'https://web-production-62be6.up.railway.app';
-        let mainChart = null;
-
-        function toggleConfig() { document.getElementById('config-menu').classList.toggle('active'); }
-        function toggleBlur() { document.querySelectorAll('.val-data').forEach(el => el.classList.toggle('hidden-val')); }
+        let charts = {};
         const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
-        async function fetchOmie(endpoint, call, param) {
+        function toggleConfig() { document.getElementById('config-menu').classList.toggle('active'); }
+        
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        async function api(endpoint, call, param) {
             const res = await fetch(`${RAILWAY_URL}/omie/data`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -160,84 +155,100 @@
         }
 
         async function carregarDados() {
-            const btn = document.getElementById('btn-sync');
             const loader = document.getElementById('loading-bar');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ATUALIZANDO...';
             loader.style.width = '30%';
             
             try {
                 const [rec, pag] = await Promise.all([
-                    fetchOmie('financas/contareceber', 'ListarContasReceber', { pagina: 1, registros_por_pagina: 50, apenas_importado_api: 'N' }),
-                    fetchOmie('financas/contapagar', 'ListarContasPagar', { pagina: 1, registros_por_pagina: 50, apenas_importado_api: 'N' })
+                    api('financas/contareceber', 'ListarContasReceber', { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' }),
+                    api('financas/contapagar', 'ListarContasPagar', { pagina: 1, registros_por_pagina: 100, apenas_importado_api: 'N' })
                 ]);
 
-                loader.style.width = '75%';
-                let sumRec = 0, sumPag = 0, rows = [];
-                let aging = { 'Atrasado': 0, 'Hoje': 0, '7 Dias': 0, '15 Dias': 0, '+30 Dias': 0 };
+                loader.style.width = '70%';
+                let sumRec = 0, sumPag = 0, dataRows = [], clients = {};
+                let aging = { 'Atrasado': 0, 'Hoje': 0, 'Próx. 7d': 0, 'Futuro': 0 };
                 const hoje = new Date();
 
-                (rec.conta_receber_cadastro || rec.cadastros || []).forEach(i => {
+                (rec.conta_receber_cadastro || []).forEach(i => {
                     const v = parseFloat(i.valor_documento || 0); sumRec += v;
-                    const nome = i.nome_cliente || i.cliente_fantasia || i.razao_social || 'Cliente';
-                    rows.push({ d: i.data_vencimento, n: nome, v: v, t: 'rec' });
+                    const nome = i.nome_cliente || 'Cliente';
+                    dataRows.push({ d: i.data_vencimento, n: nome, v: v, t: 'rec' });
                     
+                    // Aging
                     const venc = new Date(i.data_vencimento.split('/').reverse().join('-'));
-                    const diff = Math.ceil((venc - hoje) / (1000 * 60 * 60 * 24));
+                    const diff = Math.ceil((venc - hoje) / (86400000));
                     if (diff < 0) aging['Atrasado'] += v;
-                    else if (diff <= 1) aging['Hoje'] += v;
-                    else if (diff <= 7) aging['7 Dias'] += v;
-                    else if (diff <= 15) aging['15 Dias'] += v;
-                    else aging['+30 Dias'] += v;
+                    else if (diff === 0) aging['Hoje'] += v;
+                    else if (diff <= 7) aging['Próx. 7d'] += v;
+                    else aging['Futuro'] += v;
+
+                    // Clients Ranking
+                    clients[nome] = (clients[nome] || 0) + v;
                 });
 
-                (pag.conta_pagar_cadastro || pag.cadastros || []).forEach(i => {
+                (pag.conta_pagar_cadastro || []).forEach(i => {
                     const v = parseFloat(i.valor_documento || 0); sumPag += v;
-                    const nome = i.nome_fornecedor || i.fornecedor_fantasia || i.razao_social || 'Fornecedor';
-                    rows.push({ d: i.data_vencimento, n: nome, v: -v, t: 'pag' });
+                    dataRows.push({ d: i.data_vencimento, n: i.nome_fornecedor || 'Fornecedor', v: -v, t: 'pag' });
                 });
 
+                // Update Visão Geral
                 document.getElementById('kpi-rec').textContent = fmt(sumRec);
                 document.getElementById('kpi-pag').textContent = fmt(sumPag);
                 document.getElementById('kpi-saldo').textContent = fmt(sumRec - sumPag);
-                document.getElementById('kpi-ticket').textContent = fmt(sumRec / (rows.filter(x=>x.t==='rec').length || 1));
 
-                renderTable(rows);
-                renderChart(aging);
+                // Update Table Geral
+                dataRows.sort((a,b) => b.d.split('/').reverse().join('') - a.d.split('/').reverse().join(''));
+                document.getElementById('table-geral').innerHTML = dataRows.slice(0, 8).map(i => `
+                    <tr><td>${i.d}</td><td>${i.n}</td><td style="font-weight:700; color:${i.v < 0 ? '#e2533a' : '#5c1896'}">${fmt(i.v)}</td></tr>
+                `).join('');
+
+                // Render Aging Chart
+                renderAging(aging);
                 
+                // Render DRE
+                renderDRE(sumRec, sumPag);
+
+                // Render Client Ranking
+                renderClients(clients);
+
                 loader.style.width = '100%';
-                setTimeout(() => { loader.style.width = '0'; toggleConfig(); btn.innerHTML = 'DADOS ATUALIZADOS'; }, 600);
+                setTimeout(() => { loader.style.width = '0'; toggleConfig(); }, 600);
             } catch (e) {
-                alert("Erro ao conectar. Verifique as chaves Omie.");
-                btn.innerHTML = 'TENTAR NOVAMENTE';
+                alert("Erro ao sincronizar. Verifique as credenciais.");
                 loader.style.width = '0';
             }
         }
 
-        function renderTable(data) {
-            data.sort((a,b) => b.d.split('/').reverse().join('') - a.d.split('/').reverse().join(''));
-            document.getElementById('table-body').innerHTML = data.slice(0, 15).map(i => `
-                <tr>
-                    <td style="color:#999; font-weight:600;">${i.d}</td>
-                    <td><span class="pill ${i.t}">${i.t.toUpperCase()}</span> <strong>${i.n}</strong></td>
-                    <td style="font-weight:800; color:${i.v < 0 ? 'var(--secondary)' : 'var(--primary)'}">${fmt(i.v)}</td>
-                </tr>
-            `).join('');
+        function renderAging(data) {
+            if(charts.aging) charts.aging.destroy();
+            charts.aging = new Chart(document.getElementById('chart-aging'), {
+                type: 'bar',
+                data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#e2533a', '#00a99d', '#5c1896', '#5c1896'], borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false } }
+            });
         }
 
-        function renderChart(agingData) {
-            if(mainChart) mainChart.destroy();
-            mainChart = new Chart(document.getElementById('chart-main'), {
+        function renderDRE(rec, pag) {
+            const dreTable = document.getElementById('table-dre');
+            const impostos = rec * 0.15; // Simulação de 15% de impostos
+            const margem = rec - impostos - pag;
+            
+            dreTable.innerHTML = `
+                <tr class="dre-row-main"><td>RECEITA BRUTA (Vendas)</td><td class="dre-positive">${fmt(rec)}</td></tr>
+                <tr><td>(-) Deduções e Impostos (Simulado 15%)</td><td class="dre-negative">${fmt(impostos)}</td></tr>
+                <tr class="dre-row-main"><td>RECEITA LÍQUIDA</td><td>${fmt(rec - impostos)}</td></tr>
+                <tr><td>(-) Custos e Despesas Operacionais</td><td class="dre-negative">${fmt(pag)}</td></tr>
+                <tr class="dre-row-main" style="background: var(--primary); color: #fff;"><td>LUCRO / PREJUÍZO LÍQUIDO</td><td>${fmt(margem)}</td></tr>
+            `;
+        }
+
+        function renderClients(clients) {
+            if(charts.clients) charts.clients.destroy();
+            const sorted = Object.entries(clients).sort((a,b) => b[1] - a[1]).slice(0, 10);
+            charts.clients = new Chart(document.getElementById('chart-clientes'), {
                 type: 'bar',
-                data: {
-                    labels: Object.keys(agingData),
-                    datasets: [{
-                        label: 'Volume Projetado (R$)',
-                        data: Object.values(agingData),
-                        backgroundColor: ['#e2533a', '#00a99d', '#5c1896', '#5c1896', '#5c1896'],
-                        borderRadius: 6
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                data: { labels: sorted.map(x => x[0]), datasets: [{ label: 'Total Faturado', data: sorted.map(x => x[1]), backgroundColor: '#00a99d', borderRadius: 6 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
             });
         }
     </script>
